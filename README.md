@@ -29,12 +29,10 @@
 - Job 1 : Génération des bulletins
   - Lit tous les employés, récupère les heures et les congés validés.
   - Calcule le brut/net et génère un PDF.
-- Job 2 : Export CSV
-  - Exporte la table payslip dans `exported_payslips.csv`.
 
 ## 2) Base de données (PostgreSQL)
 L'application utilise plusieurs tables interconnectées : `poste`, `employee`, `hours_declaration`, `leave_request` et `payslip`.
-* **Règle métier :** À la validation d'un congé, l'API décrémente automatiquement le solde (CP ou RTT) en fonction des jours ouvrés.
+
 
 ## 3) Structure des projets
 * **ProjectApp (Port 8081) :** Interface utilisateur (Thymeleaf/Spring Security).
