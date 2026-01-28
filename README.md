@@ -29,6 +29,8 @@
 - Job 1 : Génération des bulletins
   - Lit tous les employés, récupère les heures et les congés validés.
   - Calcule le brut/net et génère un PDF.
+  - Fréquence & Simulation : Le processus s'exécute toutes les 30 secondes pour simuler un traitement en temps réel.
+  - Sécurité anti-doublon : Le système vérifie systématiquement si un bulletin existe déjà pour le couple (employé, mois) afin d'éviter toute génération multiple inutile.
 
 ## 2) Base de données (PostgreSQL)
 L'application utilise plusieurs tables interconnectées : `poste`, `employee`, `hours_declaration`, `leave_request` et `payslip`.
