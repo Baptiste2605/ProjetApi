@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{_layout :: layout(~{::body})}">
+<body>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h3 mb-1">Espace Ressources Humaines</h1>
+        <div class="text-muted small">Gestion des employés et des bulletins.</div>
+    </div>
+</div>
+
+<ul class="nav nav-tabs mb-4">
+    <li class="nav-item">
+        <a class="nav-link" th:href="@{/rh/employees}" th:classappend="${active == 'rh'} ? 'active'">👥 Employés</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" th:href="@{/rh/leaves}" th:classappend="${active == 'leaves'} ? 'active'">✅ Validation Congés</a>
+    </li>
+</ul>
+
+<form class="row g-2 mt-2" method="get" th:action="@{/rh/employees}">
+    <div class="col-md-6">
+        <input class="form-control" name="q" th:value="${q}" placeholder="Rechercher par ID, prénom, nom ou email"/>
+    </div>
+    <div class="col-md-2">
+        <button class="btn btn-outline-primary w-100" type="submit">Rechercher</button>
+    </div>
+    <div class="col-md-2">
+        <a class="btn btn-outline-secondary w-100" th:href="@{/rh/employees}">Réinitialiser</a>
+    </div>
+ 
+</form>
+
+<form class="row g-2 mt-3" 
+      th:action="${editMode} ? @{'/rh/employees/' + ${form.id} + '/update'} : @{/rh/employees}" 
+      method="post" th:object="${form}">
+    
+    <input type="hidden" th:if="${editMode}" th:field="*{id}" />
+    <div class="col-md-2"><input class="form-control" th:field="*{firstName}" placeholder="Prénom" required minlength="2"/></div>
+    <div class="col-md-2"><input class="form-control" th:field="*{lastName}" placeholder="Nom" required minlength="2"/></div>
+    <div class="col-md-3"><input class="form-control" th:field="*{email}" placeholder="Email" type="email" required/></div>
+    <div class="col-md-3">
+        <select class="form-select" th:field="*{posteId}">
+            <option value="">-- Sélectionner un poste --</option>
+            <option th:each="p : ${postes}" th:value="${p.id}" th:text="${p.name}"></option>
+        </select>
+        <div class="text-danger" th:if="${#fields.hasErrors('posteId')}" th:errors="*{posteId}"></div>
+    </div>
+    <div class="col-md-2 d-flex gap-2">
+        <button class="btn btn-success w-100" type="submit" th:text="${editMode} ? 'Enregistrer' : 'Ajouter'">Ajouter</button>
+        <a th:if="${editMode}" class="btn btn-outline-secondary" th:href="@{/rh/employees}">Annuler</a>
+    </div>
+</form>
+
+<table class="table table-striped mt-3">
+    <thead>
+    <tr>
+        <th>ID</th><th>Nom</th><th>Email</th><th>Poste</th><th class="text-end">Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:if="${#lists.isEmpty(employees)}">
+        <td colspan="5" class="text-muted">Aucun employé</td>
+    </tr>
+    <tr th:each="e : ${employees}">
+        <td th:text="${e.id}"></td>
+        <td th:text="${e.firstName + ' ' + e.lastName}"></td>
+        <td th:text="${e.email}"></td>
+        
+        <td th:text="${e.poste?.name ?: 'Non assigné'}"></td>
+        
+        <td class="text-end">
+            <a class="btn btn-sm btn-secondary me-2" th:href="@{'/rh/employees/' + ${e.id} + '/payslips'}">Bulletins</a>
+            <a class="btn btn-sm btn-primary me-2" th:href="@{'/rh/employees'(editId=${e.id}, q=${q})}">Modifier</a>
+            <form th:action="@{'/rh/employees/' + ${e.id} + '/delete'}" method="post" class="d-inline">
+                <button class="btn btn-sm btn-outline-danger" onclick="return confirm('Supprimer cet employé ?')">Supprimer</button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<div class="card mt-4 mb-5" th:if="${showPayslips}">
+    <div class="card-body">
+        <h5 class="card-title">Bulletins de paie <span th:text="'- ' + ${selectedEmployeeName}">- Employé</span></h5>
+        <div class="table-responsive">
+            <table class="table table-bordered table-sm mb-0">
+                <thead class="table-light">
+                <tr>
+                    <th>Mois</th><th>Brut (€)</th><th>Net (€)</th><th>Statut</th><th>Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="p : ${payslips}">
+                    <td th:text="${#temporals.format(p.month, 'MM/yyyy')}"></td>
+                    <td th:text="${p.gross}"></td>
+                    <td th:text="${p.net}"></td>
+                    <td th:text="${p.status}"></td>
+                    <td>
+                        <a class="btn btn-sm btn-outline-primary"
+                           th:href="@{'/rh/payslips/' + ${p.id} + '/download'}">
+                            📥 Télécharger
+                        </a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="d-flex justify-content-between align-items-center mt-3">
+            <span class="text-secondary small" th:text="${payslips.size()} + ' bulletins'"></span>
+            <a class="btn btn-outline-secondary" th:href="@{/rh/employees}">Fermer</a>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

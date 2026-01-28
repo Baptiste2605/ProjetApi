@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr"
+      th:replace="~{_layout :: layout(~{::body})}">
+<body>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h3 mb-1">Espace Ressources Humaines</h1>
+        <div class="text-muted small">Gestion des absences et validations.</div>
+    </div>
+</div>
+
+<ul class="nav nav-tabs mb-4">
+    <li class="nav-item">
+        <a class="nav-link" th:href="@{/rh/employees}" th:classappend="${active == 'rh'} ? 'active'">👥 Employés</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" th:href="@{/rh/leaves}" th:classappend="${active == 'leaves'} ? 'active'">✅ Validation Congés</a>
+    </li>
+</ul>
+
+<div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+    <span th:text="${success}">Succès</span>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+        <h5 class="card-title mb-0">Demandes d'absence</h5>
+        <span class="badge bg-secondary" th:text="${leaves.size() + ' demandes'}">0 demandes</span>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+            <tr>
+                <th>Employé (ID)</th>
+                <th>Type</th>
+                <th>Dates</th>
+                <th>Motif</th>
+                <th>Statut</th>
+                <th class="text-end">Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:if="${#lists.isEmpty(leaves)}">
+                <td colspan="6" class="text-center text-muted py-5">Aucune demande de congé pour le moment.</td>
+            </tr>
+            <tr th:each="l : ${leaves}" th:classappend="${l.status == 'EN_ATTENTE'} ? 'table-warning bg-opacity-25'">
+                <td>
+                    <div class="fw-bold">Employé #<span th:text="${l.employeeId}"></span></div>
+                    </td>
+                <td><span class="badge bg-info text-dark" th:text="${l.type}">CP</span></td>
+                <td>
+                    Du <span th:text="${#temporals.format(l.startDate, 'dd/MM')}"></span>
+                    au <span th:text="${#temporals.format(l.endDate, 'dd/MM/yyyy')}"></span>
+                    <br>
+                    <small class="text-muted" th:text="${l.daysCount + ' jours'}"></small>
+                </td>
+                <td class="text-muted small" th:text="${l.reason}">Motif</td>
+                <td>
+                    <span th:if="${l.status == 'VALIDÉ'}" class="badge bg-success">Validé</span>
+                    <span th:if="${l.status == 'REFUSÉ'}" class="badge bg-danger">Refusé</span>
+                    <span th:if="${l.status == 'EN_ATTENTE'}" class="badge bg-warning text-dark">En attente</span>
+                </td>
+                <td class="text-end">
+                    <div th:if="${l.status == 'EN_ATTENTE'}" class="btn-group">
+                        <form th:action="@{'/rh/leaves/' + ${l.id} + '/update'}" method="post">
+                            <input type="hidden" name="status" value="VALIDÉ"/>
+                            <button type="submit" class="btn btn-success btn-sm me-1" title="Valider">
+                                ✅
+                            </button>
+                        </form>
+                        <form th:action="@{'/rh/leaves/' + ${l.id} + '/update'}" method="post">
+                            <input type="hidden" name="status" value="REFUSÉ"/>
+                            <button type="submit" class="btn btn-danger btn-sm" title="Refuser" onclick="return confirm('Refuser cette demande ?')">
+                                ❌
+                            </button>
+                        </form>
+                    </div>
+                    <span th:unless="${l.status == 'EN_ATTENTE'}" class="text-muted small">Traité</span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+</body>
+</html>

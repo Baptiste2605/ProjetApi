@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html
+
+        xmlns:th="http://www.thymeleaf.org" lang="fr"
+
+        th:replace="~{_layout :: layout(~{::body})}" xmlns:sec="http://www.w3.org/1999/xhtml">
+<body>
+
+<div class="d-flex justify-content-between align-items-center flex-wrap">
+    <div>
+        <h1 class="h3 mb-1" th:text="${pageTitle}">Mes bulletins</h1>
+       <ul class="nav nav-tabs mb-4">
+  <li class="nav-item">
+    <a class="nav-link" th:href="@{/me/payslips}" th:classappend="${activeTab == 'payslips'} ? 'active'">📑 Mes Bulletins</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" th:href="@{/me/hours}" th:classappend="${activeTab == 'hours'} ? 'active'">⏱️ Saisir mes heures</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" th:href="@{/me/news}" th:classappend="${activeTab == 'news'} ? 'active'">📰 Infos Groupe</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" th:href="@{/me/leaves}" th:classappend="${activeTab == 'leaves'} ? 'active'">🏖️ Conges & Absences</a>
+  </li>
+</ul>
+        <div class="text-muted small">
+
+            Consultez vos bulletins de paie.
+        </div>
+    </div>
+
+    <div class="text-end small" sec:authorize="isAuthenticated()">
+
+        Connecté en tant que
+        <strong sec:authentication="name"></strong>
+    </div>
+
+</div>
+
+
+<div class="card mt-4 shadow-sm">
+    <div class="card-body">
+        <h2 class="h5 mb-3">Historique de paie</h2>
+
+        <div class="table-responsive">
+            <table class="table table-striped align-middle mb-0">
+                <thead class="table-light">
+                <tr>
+                    <th>Mois</th>
+                    <th>Brut (€)</th>
+                    <th>Net (€)</th>
+                    <th>Statut</th>
+                    <th>Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="p : ${payslips}">
+                    <td th:text="${#temporals.format(p.month, 'MM/yyyy')}"></td>
+                    <td th:text="${p.gross}"></td>
+                    <td th:text="${p.net}"></td>
+                    <td>
+                        <span class="badge bg-secondary" th:text="${p.status}"></span>
+                    </td>
+                    <td>
+                        <a th:if="${p.status == 'PDF_OK'}" 
+                        th:href="@{/me/payslips/{id}/download(id=${p.id})}" 
+                        class="btn btn-primary btn-sm">
+                        📥 Télécharger
+                        </a>
+
+                        <span th:unless="${p.status == 'PDF_OK'}" class="text-muted small">
+                            En attente
+                        </span>
+                  </td>
+                </tr>
+
+                <tr th:if="${#lists.isEmpty(payslips)}">
+                    <td colspan="4" class="text-muted text-center py-4">
+
+                        Aucun bulletin disponible.
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="text-end small text-muted mt-2">
+            <span th:text="${payslips.size()} + ' bulletin(s) affiché(s)'">0 bulletin(s) affiché(s)</span>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
+

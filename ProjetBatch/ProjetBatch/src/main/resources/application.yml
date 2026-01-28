@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: projet-batch
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: password
+  jpa:
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        format_sql: true
+    show-sql: false
+  batch:
+    job:
+        enabled: false
+    jdbc:
+      initialize-schema: always   # crée les tables Spring Batch si besoin
+
+server:
+  port: 8082
+
+# Config batch / PDF / mail
+app:
+  payslips:
+    storage-dir: ./payslips
+  batch:
+    hours-default: 151.67
+  mail:
+    enabled: false

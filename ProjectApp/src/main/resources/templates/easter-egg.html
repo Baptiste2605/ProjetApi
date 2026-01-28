@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr"
+
+      th:replace="~{_layout :: layout(~{::body})}">
+<body>
+<style>
+
+  @keyframes shake {
+
+  0%, 100% { transform: translate(0, 0); }
+
+  25% { transform: translate(3px, -3px); }
+
+  50% { transform: translate(-3px, 3px); }
+
+  75% { transform: translate(3px, 3px); }
+
+  }
+
+  .shake {
+
+  animation: shake 0.25s ease-in-out;
+
+  }
+</style>
+<div class="container py-4">
+  <h1 class="mb-3">Easter egg</h1>
+  <p class="text-muted">Question officielle :</p>
+
+  <div id="egg-zone" class="position-relative border rounded p-4"
+
+       style="min-height: 260px; overflow: hidden; background: #f7f9ff;">
+    <h3 class="mb-4">Notre note est-elle de <span class="text-primary">20/20</span> ?</h3>
+
+    <div class="d-flex gap-3">
+      <button id="btn-yes" class="btn btn-success btn-lg">Oui</button>
+      <button id="btn-no" class="btn btn-outline-danger btn-lg position-absolute">Non</button>
+    </div>
+
+    <div id="answer" class="alert alert-success mt-4 d-none" role="alert">
+
+      Excellent choix. Baptiste et Marius sont fort
+    </div>
+  </div>
+</div>
+
+<script>
+
+  (function() {
+
+      const zone = document.getElementById('egg-zone');
+
+      const noBtn = document.getElementById('btn-no');
+
+      const yesBtn = document.getElementById('btn-yes');
+
+      const answer = document.getElementById('answer');
+
+      let escapeCount = 0; 
+
+      
+
+      function placeNoRandom() {
+
+          const pad = 8;
+
+          const zRect = zone.getBoundingClientRect();
+
+          const btnRect = noBtn.getBoundingClientRect();
+
+          const maxX = zRect.width - btnRect.width - pad;
+
+          const maxY = zRect.height - btnRect.height - pad;
+
+          const x = Math.random() * maxX;
+
+          const y = Math.random() * maxY;
+
+          noBtn.style.left = x + 'px';
+
+          noBtn.style.top  = y + 'px';
+
+      }
+
+
+      function onMouseMove(e) {
+
+          const dangerRadius = 160;
+
+          const nr = noBtn.getBoundingClientRect();
+
+          const mouseX = e.clientX;
+
+          const mouseY = e.clientY;
+
+          const cx = nr.left + nr.width / 2;
+
+          const cy = nr.top + nr.height / 2;
+
+          const dx = mouseX - cx;
+
+          const dy = mouseY - cy;
+
+          const dist = Math.hypot(dx, dy);
+
+          if (dist < dangerRadius) {
+
+              escapeCount++;
+
+              
+
+              if (escapeCount === 5) noBtn.textContent = "Non ";
+
+              if (escapeCount === 10) noBtn.textContent = "J’ai peur ";
+
+              if (escapeCount === 15) noBtn.textContent = "Bon ok... 20/20 ";
+
+           
+
+              const zRect = zone.getBoundingClientRect();
+
+              let nx = nr.left - dx * 1.8;
+
+              let ny = nr.top - dy * 1.8;
+
+             
+              nx += (Math.random() - 0.5) * 50;
+
+              ny += (Math.random() - 0.5) * 50;
+
+              const pad = 6;
+
+              const maxX = zRect.width - nr.width - pad;
+
+              const maxY = zRect.height - nr.height - pad;
+
+              nx = Math.max(pad, Math.min(maxX, nx - zRect.left));
+
+              ny = Math.max(pad, Math.min(maxY, ny - zRect.top));
+
+              noBtn.style.left = nx + 'px';
+
+              noBtn.style.top  = ny + 'px';
+
+          }
+
+      }
+
+   
+      yesBtn.addEventListener('click', function() {
+
+          answer.classList.remove('d-none');
+
+          yesBtn.classList.add('btn-success');
+
+          setTimeout(() => answer.classList.add('show'), 50);
+
+      });
+
+     
+
+      noBtn.addEventListener('touchstart', function(ev) {
+
+          ev.preventDefault();
+
+          placeNoRandom();
+
+      }, {passive:false});
+
+      // Initialisation
+
+      placeNoRandom();
+
+      zone.addEventListener('mousemove', onMouseMove);
+
+  })();
+</script>
+
+
+</body>
+</html>

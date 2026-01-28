@@ -1,0 +1,21 @@
+# Fichiers compilés et logs
+target/
+*.class
+*.log
+logs/
+
+# IDEs
+.idea/
+*.iml
+.vscode/
+.settings/
+.classpath
+.project
+
+# Système
+.DS_Store
+Thumbs.db
+
+# Docker volumes (par sécurité)
+postgres_data/
+payslips_generated/

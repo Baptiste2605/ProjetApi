@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{_layout :: layout(~{::body})}">
+<body>
+<div>
+    <h1>Bienvenue</h1>
+    <p>Utilisez le menu en haut pour naviguer.</p>
+    <div class="row g-3 mt-2">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Espace RH</h5>
+                    <p class="card-text">Gerer les employes (donnees de demonstration).</p>
+                    <a class="btn btn-primary" th:href="@{/rh/employees}">Ouvrir</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Espace Salarie</h5>
+                    <p class="card-text">Consulter mes bulletins de paie (donnees de demonstration).</p>
+                    <a class="btn btn-primary" th:href="@{/me/payslips}">Ouvrir</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr"
+
+      th:replace="~{_layout :: layout(~{::body})}">
+<body>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h1 class="h3 mb-1">Espace Salarié</h1>
+    <div class="text-muted small">Gérez vos absences et consultez vos soldes.</div>
+  </div>
+</div>
+
+<ul class="nav nav-tabs mb-4">
+  <li class="nav-item">
+    <a class="nav-link" th:href="@{/me/payslips}" th:classappend="${activeTab == 'payslips'} ? 'active'">📑 Mes Bulletins</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" th:href="@{/me/hours}" th:classappend="${activeTab == 'hours'} ? 'active'">⏱️ Saisir mes heures</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" th:href="@{/me/news}" th:classappend="${activeTab == 'news'} ? 'active'">📰 Infos Groupe</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" th:href="@{/me/leaves}" th:classappend="${activeTab == 'leaves'} ? 'active'">🏖️ Conges & Absences</a>
+  </li>
+</ul>
+
+<div class="row mb-4">
+  <div class="col-md-6 mb-3">
+    <div class="card bg-primary text-white h-100 shadow-sm">
+      <div class="card-body d-flex justify-content-between align-items-center">
+        <div>
+          <h6 class="text-uppercase mb-1 opacity-75">Congés Payés (CP)</h6>
+          <h2 class="display-6 fw-bold mb-0" th:text="${soldeCP}">0</h2>
+          <small>Jours restants</small>
+        </div>
+        <div style="font-size: 3rem; opacity: 0.3;">️</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6 mb-3">
+    <div class="card bg-info text-white h-100 shadow-sm">
+      <div class="card-body d-flex justify-content-between align-items-center">
+        <div>
+          <h6 class="text-uppercase mb-1 opacity-75">RTT</h6>
+          <h2 class="display-6 fw-bold mb-0" th:text="${soldeRTT}">0</h2>
+          <small>Jours restants</small>
+        </div>
+        <div style="font-size: 3rem; opacity: 0.3;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-4">
+    <div class="card shadow-sm">
+      <div class="card-header bg-white py-3">
+        <h5 class="card-title mb-0">Nouvelle demande</h5>
+      </div>
+      <div class="card-body">
+        <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+          <small th:text="${successMessage}"></small>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <form th:action="@{/me/leaves}" method="post" th:object="${leaveRequest}">
+          <div class="mb-3">
+            <label class="form-label">Type d'absence</label>
+            <select class="form-select" th:field="*{type}">
+              <option value="CP">Congés Payés (CP)</option>
+              <option value="RTT">RTT</option>
+              <option value="MALADIE">Maladie</option>
+              <option value="SANS_SOLDE">Sans Solde</option>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Date de début</label>
+            <input type="date" class="form-control" th:field="*{startDate}" required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Date de fin (inclus)</label>
+            <input type="date" class="form-control" th:field="*{endDate}" required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Motif (optionnel)</label>
+            <textarea class="form-control" rows="2" th:field="*{reason}" placeholder="Ex: Vacances d'été..."></textarea>
+          </div>
+
+          <div class="d-grid">
+            <button type="submit" class="btn btn-primary">Envoyer la demande</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-8">
+    <div class="card shadow-sm h-100">
+      <div class="card-header bg-white py-3">
+        <h5 class="card-title mb-0">Mes dernières demandes</h5>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light">
+          <tr>
+            <th>Type</th>
+            <th>Période</th>
+            <th>Durée</th>
+            <th>Statut</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr th:if="${#lists.isEmpty(leaves)}">
+            <td colspan="4" class="text-center text-muted py-4">Aucune demande récente.</td>
+          </tr>
+          <tr th:each="l : ${leaves}">
+            <td>
+              <span class="fw-bold" th:text="${l.type}">Type</span>
+            </td>
+            <td>
+
+              Du <span th:text="${#temporals.format(l.startDate, 'dd/MM')}"></span>
+
+              au <span th:text="${#temporals.format(l.endDate, 'dd/MM/yyyy')}"></span>
+            </td>
+            <td>
+              <span th:text="${l.daysCount}"></span> jour(s)
+            </td>
+            <td>
+              <span th:if="${l.status == 'VALIDÉ'}" class="badge bg-success">Validé</span>
+              <span th:if="${l.status == 'EN_ATTENTE'}" class="badge bg-warning text-dark">En attente</span>
+              <span th:if="${l.status == 'REFUSÉ'}" class="badge bg-danger">Refusé</span>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+</body>
+</html>

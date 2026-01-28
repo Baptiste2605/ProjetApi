@@ -1,0 +1,29 @@
+spring:
+  application:
+    name: mywebapp
+  thymeleaf:
+    cache: false
+server:
+  port: 8081
+
+# ↓↓↓ défaut pris même sans profil ↓↓↓
+app:
+  gateway: feign
+  api:
+    url: http://localhost:8080
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev-mock
+app:
+  gateway: mock
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev-feign
+app:
+  gateway: feign

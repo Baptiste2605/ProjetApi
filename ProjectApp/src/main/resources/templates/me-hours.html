@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr"
+      th:replace="~{_layout :: layout(~{::body})}">
+<body>
+ 
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h1 class="h3 mb-1">Espace Salarie</h1>
+    <div class="text-muted small">Gerer votre temps et consulter vos documents.</div>
+  </div>
+</div>
+ 
+<ul class="nav nav-tabs mb-4">
+  <li class="nav-item">
+    <a class="nav-link" th:href="@{/me/payslips}" th:classappend="${activeTab == 'payslips'} ? 'active'">📑 Mes Bulletins</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" th:href="@{/me/hours}" th:classappend="${activeTab == 'hours'} ? 'active'">⏱️ Saisir mes heures</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" th:href="@{/me/news}" th:classappend="${activeTab == 'news'} ? 'active'">📰 Infos Groupe</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" th:href="@{/me/leaves}" th:classappend="${activeTab == 'leaves'} ? 'active'">🏖️ Conges & Absences</a>
+  </li>
+</ul>
+ 
+<div class="card shadow-sm" style="max-width: 600px;">
+  <div class="card-header bg-white py-3">
+    <h5 class="card-title mb-0">Declaration mensuelle</h5>
+  </div>
+  <div class="card-body">
+ 
+    <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+      <span th:text="${successMessage}">Succes</span>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+ 
+    <!-- IMPORTANT: on bind le formulaire a l'objet 'declaration' -->
+    <form th:action="@{/me/hours}" method="post">
+    <!-- cachés requis -->
+    <input type="hidden" name="employeeId" th:value="${employeeId}" />
+    <input type="hidden" name="month" th:value="${month}" />
+ 
+    <hr class="text-muted opacity-25">
+ 
+    <div class="row g-3 align-items-center mb-2">
+        <div class="col-4"><label class="col-form-label">Semaine 1</label></div>
+        <div class="col-8">
+        <div class="input-group">
+            <input name="week1" type="number" step="0.5" min="0" class="form-control hour-input" value="35">
+            <span class="input-group-text">h</span>
+        </div>
+        </div>
+    </div>
+ 
+    <div class="row g-3 align-items-center mb-2">
+        <div class="col-4"><label class="col-form-label">Semaine 2</label></div>
+        <div class="col-8">
+        <div class="input-group">
+            <input name="week2" type="number" step="0.5" min="0" class="form-control hour-input" value="35">
+            <span class="input-group-text">h</span>
+        </div>
+        </div>
+    </div>
+ 
+    <div class="row g-3 align-items-center mb-2">
+        <div class="col-4"><label class="col-form-label">Semaine 3</label></div>
+        <div class="col-8">
+        <div class="input-group">
+            <input name="week3" type="number" step="0.5" min="0" class="form-control hour-input" value="35">
+            <span class="input-group-text">h</span>
+        </div>
+        </div>
+    </div>
+ 
+    <div class="row g-3 align-items-center mb-4">
+        <div class="col-4"><label class="col-form-label">Semaine 4</label></div>
+        <div class="col-8">
+        <div class="input-group">
+            <input name="week4" type="number" step="0.5" min="0" class="form-control hour-input" value="35">
+            <span class="input-group-text">h</span>
+        </div>
+        </div>
+    </div>
+ 
+    <div class="alert alert-light border d-flex justify-content-between align-items-center">
+        <span class="fw-bold text-primary">Total du mois</span>
+        <h4 class="mb-0 fw-bold">
+        <span id="displayTotal" th:text="${submittedTotal != null ? submittedTotal : 140}">140</span> h
+        </h4>
+    </div>
+ 
+    <div class="d-grid">
+        <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">Valider la declaration</button>
+    </div>
+    </form>
+ 
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const inputs = document.querySelectorAll('.hour-input');
+        const displayTotal = document.getElementById('displayTotal');
+        function calculateTotal() {
+        let total = 0;
+        inputs.forEach(i => total += (parseFloat(i.value) || 0));
+        displayTotal.textContent = total;
+        }
+        inputs.forEach(i => i.addEventListener('input', calculateTotal));
+        calculateTotal();
+    });
+    </script>
+ 
+ 
+</body>
+</html>
+ 
+ 

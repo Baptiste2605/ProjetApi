@@ -1,0 +1,73 @@
+services:
+  # 1. Base de données
+  postgres:
+    image: postgres:16
+    container_name: projet_db
+    environment:
+      POSTGRES_DB: project_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # 2. API (Backend) - C'est elle qui LIT le PDF pour le téléchargement
+  api:
+    build: ./ProjetApi
+    container_name: projet_api
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/project_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: password
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+
+      APP_PAYSLIPS_STORAGE_DIR: /app/payslips
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - payslips_volume:/app/payslips 
+
+  # 3. Batch (Moteur de paie) - C'est lui qui ÉCRIT le PDF
+  batch:
+    build: ./ProjetBatch/ProjetBatch
+    container_name: projet_batch
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/project_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: password
+  
+      APP_PAYSLIPS_STORAGE_DIR: /app/payslips
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - payslips_volume:/app/payslips 
+
+  # 4. App (Frontend)
+  app:
+    build: ./ProjectApp
+    container_name: projet_app
+    ports:
+      - "8081:8081"
+    environment:
+      # Connexion aux autres services via leurs noms Docker
+      APP_API_URL: http://api:8080
+      APP_BATCH_URL: http://batch:8082
+      APP_GATEWAY: feign
+    depends_on:
+      - api
+      - batch
+
+
+volumes:
+  payslips_volume:

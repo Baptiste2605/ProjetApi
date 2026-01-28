@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr"
+
+      th:replace="~{_layout :: layout(~{::body})}">
+<body>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h1 class="h3 mb-1">Espace Salarié</h1>
+    <div class="text-muted small">Restez informé des dernières nouvelles de l'entreprise.</div>
+  </div>
+</div>
+<ul class="nav nav-tabs mb-4">
+  <li class="nav-item">
+    <a class="nav-link" th:href="@{/me/payslips}" th:classappend="${activeTab == 'payslips'} ? 'active'">📑 Mes Bulletins</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" th:href="@{/me/hours}" th:classappend="${activeTab == 'hours'} ? 'active'">⏱️ Saisir mes heures</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" th:href="@{/me/news}" th:classappend="${activeTab == 'news'} ? 'active'">📰 Infos Groupe</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" th:href="@{/me/leaves}" th:classappend="${activeTab == 'leaves'} ? 'active'">🏖️ Conges & Absences</a>
+  </li>
+</ul>
+<div class="col-md-6" th:each="news : ${newsList}">
+  <div class="card h-100 shadow-sm border-0 overflow-hidden">
+
+    <div th:if="${news.imagePath != null}" class="position-relative">
+      <img th:src="@{${news.imagePath}}" class="card-img-top" alt="News image"
+
+           style="height: 400px; object-fit: cover; object-position: top;">
+    </div>
+
+    <div class="card-body">
+      <div class="d-flex justify-content-between align-items-start mb-2">
+<span class="badge rounded-pill"
+
+      th:classappend="'text-bg-' + ${news.styleClass}"
+
+      th:text="${news.category}">Catégorie</span>
+        <small class="text-muted" th:text="${#temporals.format(news.date, 'dd/MM/yyyy')}">Date</small>
+      </div>
+
+      <h5 class="card-title fw-bold mt-2" th:text="${news.title}">Titre</h5>
+      <p class="card-text text-secondary mt-3" th:text="${news.content}">Contenu</p>
+    </div>
+
+    <div class="card-footer bg-transparent border-0 text-end">
+      <small class="text-muted fst-italic">Publié par la Direction</small>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
